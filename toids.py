@@ -16,17 +16,32 @@ def create_random_turtle() -> turtle.Turtle:
 def visible_from(boid: turtle.Turtle, other: turtle.Turtle) -> bool:
     return abs(boid.towards(other) - boid.heading()) < 90
 
+
 def mean(flock: Sequence[turtle.Turtle]) -> Tuple[float, float]:
     x = sum(b.xcor() for b in flock) / len(flock)
     y = sum(b.ycor() for b in flock) / len(flock)
     return x, y
 
+
+def closest_to(boid: turtle.Turtle, flock: Sequence [turtle.Turtle]) -> turtle.Turtle:
+    return min((b for b in flock), key=lambda b: boid.distance(b))
+
+
 def step(flock: Sequence[turtle.Turtle]) -> None:
-    for boid in flock:
-        visible = [b for b in flock if visible_from(boid, b) and b != boid]
-        if len(visible):
-            mean_visible = mean(visible)
-            boid.left(boid.towards(mean_visible) - boid.heading())
+    for i, boid in enumerate(flock):
+        angle = 0
+        if abs(boid.pos()) > 200:
+            angle += 90 if i % 2 else -90
+        else:
+            visible = [b for b in flock if visible_from(boid, b) and b != boid]
+            if len(visible):
+                closest = closest_to(boid, visible)
+                if boid.distance(closest) < 10:
+                    angle += (boid.heading() - boid.towards(closest)) / (boid.distance(closest) / 30)
+                else:
+                    mean_visible = mean(visible)
+                    angle += boid.towards(mean_visible) - boid.heading()
+        boid.left(angle/10)
         boid.forward(10)
 
 
