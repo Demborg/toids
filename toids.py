@@ -10,6 +10,7 @@ def create_random_turtle() -> turtle.Turtle:
     t.penup()
     t.setposition(randint(-100, 100), randint(-100, 100))
     t.setheading(randint(0, 360))
+    t.shape("turtle")
     return t
 
 
